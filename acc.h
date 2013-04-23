@@ -7,7 +7,7 @@
 #define acc_devId 0x0D
 #define GSCALE 2
 
-#define CTRL_REG1 0x2A
+#define A_CTRL_REG1 0x2A
 #define XYZ_DATA_CFG 0x0E
 
 #define OUT_X_H 0x01

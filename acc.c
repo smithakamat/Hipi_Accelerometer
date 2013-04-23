@@ -17,12 +17,12 @@ void initAcc(void)
 		printf("ERROR !!! - Accelerometer not found on I2C bus - 1\n");
 
 	/*Read CTRL_REG1 and clear its LSB*/
-	temp = read_reg(acc_slvAddr,CTRL_REG1);
+	temp = read_reg(acc_slvAddr,A_CTRL_REG1);
 	temp = temp & ~(0x01);
 	
 	/*Write into CTRL_REG1 to drive it to stand by mode*/
 	/*The accelerometer should be driven to STANDBY mode before making changes to any other registers*/
-	write_reg(acc_slvAddr,CTRL_REG1,temp);
+	write_reg(acc_slvAddr,A_CTRL_REG1,temp);
 	
 	/*Settimg up the GSCALE value*/	
 	fsr = GSCALE;
@@ -31,9 +31,9 @@ void initAcc(void)
 	write_reg(acc_slvAddr,XYZ_DATA_CFG,fsr);
 
 	/*Bring back the Accelerometer to ACTIVE mode*/
-	temp = read_reg(acc_slvAddr,CTRL_REG1);
+	temp = read_reg(acc_slvAddr,A_CTRL_REG1);
 	temp = temp | 0x01;
-	write_reg(acc_slvAddr,CTRL_REG1,temp);
+	write_reg(acc_slvAddr,A_CTRL_REG1,temp);
 	
 }
 
