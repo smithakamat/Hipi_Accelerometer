@@ -10,7 +10,7 @@ unsigned char  read_reg(unsigned char slv_addr,unsigned char reg_addr)
 	unsigned char out, val;
 	char test_buff[20];
 	sprintf(test_buff, "hipi-i2c r 1 0x%02X 0x%02X 1", slv_addr, reg_addr);
-	//printf("The test_buff is %s\n", test_buff);
+       //printf("The test_buff is %s\n", test_buff);
 	fp = popen(test_buff, "r");
 	if(fp == NULL)
 		printf("Unable to open the pipe\n");
