@@ -8,7 +8,7 @@
 void initGyro(void)
 {
 	unsigned char temp,dev_identify;
-	sleep(1);
+	//sleep(1);
 	/*Read the device identification register of the Gyroscope*/
 	dev_identify = read_reg(0x6B,0x0F);
 	printf("The dev ID if gyro is %d\n", dev_identify);
@@ -22,20 +22,20 @@ void initGyro(void)
 	temp = 0x0F;
 	write_reg(gyro_slvAddr,CTRL_REG1,temp);
 	
-	sleep(1);
+	//sleep(1);
 	/*Disable the high pass filter of the gyro*/
 	write_reg(gyro_slvAddr,CTRL_REG2,0x00);
 	
-	sleep(1);	
+	//sleep(1);	
 	/*Enabling the DRDY pin of the gyro*/
 	temp = 0x08;
 	write_reg(gyro_slvAddr,CTRL_REG3,temp);
 	
-	sleep(1);
+	//sleep(1);
 	/*Initializing CTRL_REG4*/
 	write_reg(gyro_slvAddr,CTRL_REG4,0x00);	
 
-	sleep(1);
+	//sleep(1);
 	/*Initializing CTRL_REG5*/
 	write_reg(gyro_slvAddr,CTRL_REG5,0x00);
 
@@ -46,9 +46,7 @@ void initGyro(void)
 	temp = 0x0F;
 	write_reg(gyro_slvAddr,CTRL_REG1,temp);
 
-        temp=0x00;
-	temp=read_reg(gyro_slvAddr,CTRL_REG1);
-	printf("CTRL REG 1 is %d\n",temp);
+        
 	
 }
 

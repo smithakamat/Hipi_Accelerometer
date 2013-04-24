@@ -4,14 +4,16 @@
 
 void main(void)
 {
+      
 
 	/*Initialize the Gyroscope*/
-	initGyro();
+        initGyro();
 	/*Initialize the Accelerometer*/	
 	initAcc();
 
 
 
+       
 	
 	while(1)
 	{
@@ -20,7 +22,7 @@ void main(void)
 		
 		sleep(1);		
 		/*Read the X,Y,Z axes values of the gyroscope*/
-		//readGyro_XYZ();
+		readGyro_XYZ();
 	}
 	
 }
