@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include<time.h>
 #include <sys/time.h>
 #include <sys/types.h>   
 #include "gyro.h"
 #include "i2c_rw.h"
-#include <time.h>
 
+struct timespec gyro_time;
+float xtotal, ytotal, ztotal;
 
 /*Initialization sequence of the gyroscope*/
 void initGyro(void)
@@ -59,14 +61,13 @@ void readGyro_XYZ(void)
 {
 
 	unsigned char xlow=0, xhigh=0, ylow=0, yhigh=0, zlow=0, zhigh=0;
-	float xtotal=0, ytotal=0, ztotal=0;
+	//float xtotal=0, ytotal=0, ztotal=0;
 	unsigned int raw_x, raw_y, raw_z;
-	
-	clock_t start,stop;
+	//struct timespec start,stop,time;
 
 	float elapsedTime;
-	
-	start = clock();
+	//clock_gettime(CLOCK_MONOTONIC,&start);
+
 
 	xlow = read_reg(gyro_slvAddr,OUT_X_Lo);
 	xhigh = read_reg(gyro_slvAddr,OUT_X_Hi);
@@ -77,11 +78,12 @@ void readGyro_XYZ(void)
 	zlow = read_reg(gyro_slvAddr,OUT_Z_Lo);
 	zhigh = read_reg(gyro_slvAddr,OUT_Z_Hi);
 
+	clock_gettime(CLOCK_MONOTONIC,&gyro_time);
+
 	raw_x = (xhigh << 8) + xlow;
 	raw_y = (yhigh << 8) + ylow;
 	raw_z = (zhigh << 8) + zlow;
 	
-	stop = clock();
 	printf("----------------------------------------------------\n");
 	printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
 
@@ -106,7 +108,7 @@ void readGyro_XYZ(void)
 		raw_y = raw_y;
 		ytotal = raw_y * (8.75f/1000);
 	}
-
+	//stop = clock();
 	if(raw_z > 0x7FFF)
 	{
 		raw_z = -(raw_z - 0x7FFF) + 1;
@@ -121,15 +123,22 @@ void readGyro_XYZ(void)
 	//stop = clock();
 
 
-	elapsedTime = (stop - start);   //time in milliseconds
+	//elapsedTime = (stop - start);   //time in milliseconds
 
-	printf("The elapsed time is %ld seconds\n", elapsedTime);
+	//printf("The elapsed time is %ld seconds\n", elapsedTime);
 
 	/*The sensitivity for 250 dps is 8.75 mdps/digit*/
 	//xtotal = raw_x * (8.75/1000);
 	//ytotal = raw_y * (8.75/1000);
 	//ztotal = raw_z * (8.75/1000);
-	
+	//clock_gettime(CLOCK_MONOTONIC,&stop);
+        //printf("Start  %d  %ld \n",start.tv_sec,start.tv_nsec);
+	//printf("Stop   %d  %ld \n",stop.tv_sec,stop.tv_nsec);
+
 	printf("Raw_Gyro_X : Raw_Gyro_Y : Raw_Gyro_Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
 	printf("Gyro_X : Gyro_Y : Gyro_Z : %f, %f, %f\n", xtotal, ytotal, ztotal);		
+	
+	//	stop= clock();
+	//elapsedTime = stop - start;
+	//printf("The elapsed time is %ld\n", elapsedTime);
 }

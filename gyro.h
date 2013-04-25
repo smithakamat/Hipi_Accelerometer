@@ -33,5 +33,6 @@
 #define FIFO_CTRL_REG 0x2E
 
 
-
+extern struct timespec gyro_time;
+extern float xtotal, ytotal, ztotal;
 #endif //_GYRO_H_

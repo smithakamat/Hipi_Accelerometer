@@ -17,6 +17,8 @@
 #define OUT_Z_H 0x05
 #define OUT_Z_L 0x06
 
+extern float AccG_X, AccG_Y, AccG_Z;
+
 void initAcc(void);
 void readAcc_XYZ(void);
 

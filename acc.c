@@ -4,6 +4,8 @@
 #include "acc.h"
 
 unsigned char temp;
+float AccG_X, AccG_Y, AccG_Z;
+
 
 /*Initialization sequence of the Accelerometer*/
 void initAcc(void)
@@ -45,7 +47,7 @@ void readAcc_XYZ(void)
 	unsigned int xconcat, yconcat, zconcat;
 	unsigned int raw_xconcat, raw_yconcat, raw_zconcat;
 	unsigned int conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat;
-	float AccG_X, AccG_Y, AccG_Z;
+	//float AccG_X, AccG_Y, AccG_Z;
 
 	xhigh = read_reg(acc_slvAddr,OUT_X_H);
 	xlow = read_reg(acc_slvAddr,OUT_X_L);
@@ -69,18 +71,18 @@ void readAcc_XYZ(void)
 	if(raw_xconcat > 0x7FF)
 	{
 		conv_raw_xconcat = -(raw_xconcat - 0x7FF) + 1;
-	//	AccG_X = -(conv_xconcat * GSCALE)/0x7FF;
+		AccG_X = -((float)(conv_raw_xconcat * GSCALE)/(float)0x7FF);
 	}
 	else
 	{
 		conv_raw_xconcat = raw_xconcat;
-		//AccG_X = (raw_xconcat * GSCALE)/0x7FF;
+		AccG_X =((float)(conv_raw_xconcat * GSCALE)/(float)0x7FF);
 	}
 
 	if(raw_yconcat > 0x7FF)
 	{
 		conv_raw_yconcat = -(raw_yconcat - 0x7FF) + 1;
-		//AccG_Y = -(raw_yconcat * GSCALE)/0x7FF;
+		AccG_Y = -(float)(raw_yconcat * GSCALE)/0x7FF;
 	}
 	else
 	{
