@@ -98,8 +98,8 @@ void readAcc_XYZ(void)
 		conv_raw_zconcat = raw_zconcat;
 		//AccG_Z = (raw_zconcat * GSCALE)/0x7FF;
 	}
-	printf("Raw_x : Raw_Y : Raw_Z : %d, %d, %d\n",raw_xconcat, raw_yconcat, raw_zconcat);
-	printf("Acc_X : Acc_Y : Acc_Z : %d, %d, %d\n",conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat);
+	//printf("Raw_x : Raw_Y : Raw_Z : %d, %d, %d\n",raw_xconcat, raw_yconcat, raw_zconcat);
+	//printf("Acc_X : Acc_Y : Acc_Z : %d, %d, %d\n",conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat);
 	//printf("AccG_X : AccG_Y : AccG_Z : %f, %f, %f\n", AccG_X, AccG_Y, AccG_Z);
 	printf("----------------------------------------------------\n");
 }

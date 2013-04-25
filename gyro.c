@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/types.h>   
 #include "gyro.h"
 #include "i2c_rw.h"
-
+#include <time.h>
 
 
 /*Initialization sequence of the gyroscope*/
@@ -58,6 +62,12 @@ void readGyro_XYZ(void)
 	float xtotal=0, ytotal=0, ztotal=0;
 	unsigned int raw_x, raw_y, raw_z;
 	
+	clock_t start,stop;
+
+	float elapsedTime;
+	
+	start = clock();
+
 	xlow = read_reg(gyro_slvAddr,OUT_X_Lo);
 	xhigh = read_reg(gyro_slvAddr,OUT_X_Hi);
 	
@@ -70,6 +80,10 @@ void readGyro_XYZ(void)
 	raw_x = (xhigh << 8) + xlow;
 	raw_y = (yhigh << 8) + ylow;
 	raw_z = (zhigh << 8) + zlow;
+	
+	stop = clock();
+	printf("----------------------------------------------------\n");
+	printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
 
 	if(raw_x > 0x7FFF)
 	{
@@ -104,6 +118,13 @@ void readGyro_XYZ(void)
 		ztotal = raw_z * (8.75f/1000);
 	}
 	
+	//stop = clock();
+
+
+	elapsedTime = (stop - start);   //time in milliseconds
+
+	printf("The elapsed time is %ld seconds\n", elapsedTime);
+
 	/*The sensitivity for 250 dps is 8.75 mdps/digit*/
 	//xtotal = raw_x * (8.75/1000);
 	//ytotal = raw_y * (8.75/1000);
