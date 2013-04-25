@@ -74,7 +74,7 @@ void readGyro_XYZ(void)
 	if(raw_x > 0x7FFF)
 	{
 		raw_x = -(raw_x - 0x7FFF) + 1;
-		xtotal = -raw_x * (8.75/1000);
+		xtotal = raw_x * (8.75/1000);
 	}
 	else
 	{
@@ -85,7 +85,7 @@ void readGyro_XYZ(void)
 	if(raw_y > 0x7FFF)
 	{
 		raw_y = -(raw_y - 0x7FFF) + 1;
-		ytotal = -raw_y * (8.75/1000);
+		ytotal = raw_y * (8.75/1000);
 	}
 	else
 	{
@@ -96,7 +96,7 @@ void readGyro_XYZ(void)
 	if(raw_z > 0x7FFF)
 	{
 		raw_z = -(raw_z - 0x7FFF) + 1;
-		ztotal = -raw_z * (8.75/1000);
+		ztotal = raw_z * (8.75/1000);
 	}
 	else
 	{
