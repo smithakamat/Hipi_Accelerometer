@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <float.h>
 #include "i2c_rw.h"
 #include "acc.h"
 
@@ -42,6 +43,9 @@ void readAcc_XYZ(void)
 {
 	unsigned int xlow,xhigh,ylow,yhigh,zlow,zhigh;
 	unsigned int xconcat, yconcat, zconcat;
+	unsigned int raw_xconcat, raw_yconcat, raw_zconcat;
+	unsigned int conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat;
+	float AccG_X, AccG_Y, AccG_Z;
 
 	xhigh = read_reg(acc_slvAddr,OUT_X_H);
 	xlow = read_reg(acc_slvAddr,OUT_X_L);
@@ -53,30 +57,50 @@ void readAcc_XYZ(void)
 	zlow = read_reg(acc_slvAddr,OUT_Z_L);
 
 	xconcat = (xhigh << 8) + xlow;
-	xconcat = xconcat >> 4;
+	raw_xconcat = xconcat >> 4;
 
 	yconcat = (yhigh << 8) + ylow;
-	yconcat = yconcat >> 4;
+	raw_yconcat = yconcat >> 4;
 
 	zconcat = (zhigh << 8) + zlow;
-	zconcat = zconcat >> 4;
+	raw_zconcat = zconcat >> 4;
 
 	/*Taking care of 2's complement*/
-	if(xconcat > 0x7FF)
-		xconcat = -(xconcat - 0x7FF) + 1;
+	if(raw_xconcat > 0x7FF)
+	{
+		conv_raw_xconcat = -(raw_xconcat - 0x7FF) + 1;
+	//	AccG_X = -(conv_xconcat * GSCALE)/0x7FF;
+	}
 	else
-		xconcat = xconcat;
+	{
+		conv_raw_xconcat = raw_xconcat;
+		//AccG_X = (raw_xconcat * GSCALE)/0x7FF;
+	}
 
-	if(yconcat > 0x7FF)
-		yconcat = -(yconcat - 0x7FF) + 1;
+	if(raw_yconcat > 0x7FF)
+	{
+		conv_raw_yconcat = -(raw_yconcat - 0x7FF) + 1;
+		//AccG_Y = -(raw_yconcat * GSCALE)/0x7FF;
+	}
 	else
-		yconcat = yconcat;
+	{
+		conv_raw_yconcat = raw_yconcat;
+		//AccG_Y = (raw_yconcat * GSCALE)/0x7FF;
+	}
 
-	if(zconcat > 0x7FF)
-		zconcat = -(zconcat - 0x7FF) + 1;
+	if(raw_zconcat > 0x7FF)
+	{
+		conv_raw_zconcat = -(raw_zconcat - 0x7FF) + 1;
+		//AccG_Z = -(raw_zconcat * GSCALE)/0x7FF;
+	}
 	else
-		zconcat = zconcat;
-
-	printf("Acc_X : Acc_Y : Acc_Z : %d, %d, %d\n",xconcat, yconcat, zconcat);
+	{
+		conv_raw_zconcat = raw_zconcat;
+		//AccG_Z = (raw_zconcat * GSCALE)/0x7FF;
+	}
+	printf("Raw_x : Raw_Y : Raw_Z : %d, %d, %d\n",raw_xconcat, raw_yconcat, raw_zconcat);
+	printf("Acc_X : Acc_Y : Acc_Z : %d, %d, %d\n",conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat);
+	//printf("AccG_X : AccG_Y : AccG_Z : %f, %f, %f\n", AccG_X, AccG_Y, AccG_Z);
+	printf("----------------------------------------------------\n");
 }
 

@@ -56,7 +56,8 @@ void readGyro_XYZ(void)
 
 	unsigned char xlow=0, xhigh=0, ylow=0, yhigh=0, zlow=0, zhigh=0;
 	unsigned int xtotal=0, ytotal=0, ztotal=0;
-
+	unsigned int raw_x, raw_y, raw_z;
+	
 	xlow = read_reg(gyro_slvAddr,OUT_X_Lo);
 	xhigh = read_reg(gyro_slvAddr,OUT_X_Hi);
 	
@@ -66,24 +67,48 @@ void readGyro_XYZ(void)
 	zlow = read_reg(gyro_slvAddr,OUT_Z_Lo);
 	zhigh = read_reg(gyro_slvAddr,OUT_Z_Hi);
 
-	xtotal = (xhigh << 8) + xlow;
-	ytotal = (yhigh << 8) + ylow;
-	ztotal = (zhigh << 8) + zlow;
+	raw_x = (xhigh << 8) + xlow;
+	raw_y = (yhigh << 8) + ylow;
+	raw_z = (zhigh << 8) + zlow;
 
-	if(xtotal > 0x7FFF)
-		xtotal = -(xtotal - 0x7FFF) + 1;
+	if(raw_x > 0x7FFF)
+	{
+		raw_x = -(raw_x - 0x7FFF) + 1;
+		xtotal = -raw_x * (8.75/1000);
+	}
 	else
-		xtotal = xtotal;
+	{
+		raw_x = raw_x;
+		xtotal = raw_x * (8.75/1000);
+	}
 	
-	if(ytotal > 0x7FFF)
-		ytotal = -(ytotal - 0x7FFF) + 1;
+	if(raw_y > 0x7FFF)
+	{
+		raw_y = -(raw_y - 0x7FFF) + 1;
+		ytotal = -raw_y * (8.75/1000);
+	}
 	else
-		ytotal = ytotal;
+	{
+		raw_y = raw_y;
+		ytotal = raw_y * (8.75/1000);
+	}
 
-	if(ztotal > 0x7FFF)
-		ztotal = -(ztotal - 0x7FFF) + 1;
+	if(raw_z > 0x7FFF)
+	{
+		raw_z = -(raw_z - 0x7FFF) + 1;
+		ztotal = -raw_z * (8.75/1000);
+	}
 	else
-		ztotal = ztotal;
+	{
+		raw_z = raw_z;
+		ztotal = raw_z * (8.75/1000);
+	}
 	
+	/*The sensitivity for 250 dps is 8.75 mdps/digit*/
+	//xtotal = raw_x * (8.75/1000);
+	//ytotal = raw_y * (8.75/1000);
+	//ztotal = raw_z * (8.75/1000);
+	
+	printf("Raw_Gyro_X : Raw_Gyro_Y : Raw_Gyro_Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
 	printf("Gyro_X : Gyro_Y : Gyro_Z : %d, %d, %d\n", xtotal, ytotal, ztotal);		
 }

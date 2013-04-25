@@ -20,7 +20,7 @@ void main(void)
 		/*Read the X,Y,Z axes values of the accelerometer*/
 		readAcc_XYZ();
 		
-		sleep(1);		
+	//	sleep(1);		
 		/*Read the X,Y,Z axes values of the gyroscope*/
 		readGyro_XYZ();
 	}
