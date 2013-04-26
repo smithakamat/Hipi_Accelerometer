@@ -2,9 +2,13 @@
 #include "acc.h"
 #include "gyro.h"
 #include <time.h>
+#include<stdlib.h>
+#include<malloc.h>
+#include<string.h>
 
 #define GYRO_CONST 0.98f
 #define ACC_CONST  0.02f
+#define COMMENT 0
 
 void main(void)
 {
@@ -52,7 +56,7 @@ void main(void)
 		}
 
 		concat_time = sec + (nano_sec/1000000000);
-
+		memcpy((unsigned char *)&prev,(unsigned char *)&current,sizeof(struct timespec));
 
 
 		/*Calculating the angles*/
@@ -60,7 +64,10 @@ void main(void)
 		overall_angle = ((0.98f) * (overall_angle + (xtotal * concat_time))) + ((0.02f) * AccG_X);
 		printf("The overall angle is %f\n", overall_angle);*/
 		
-
+		printf("Raw Gyro Value : %d\n",raw_x);
+		printf("Time in secs is: %ld\n",concat_time);
+		
+#if COMMENT	
 
 		/*Implementing the switch case to take care of +/-, -/+, -/- and +/+ conditions*/
    		/*the variable raw_x represents the +/- raw gyro values, the variable conv_raw_yconcat represents the raw +/- Accelerometer values */
@@ -111,8 +118,8 @@ void main(void)
                  }
 		printf("The angle is %f\n",overall_angle);
 
+#endif 
 				
-
 
 
 	}

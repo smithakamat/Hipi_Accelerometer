@@ -90,7 +90,7 @@ void readGyro_XYZ(void)
 	raw_y = (yhigh << 8) + ylow;
 	raw_z = (zhigh << 8) + zlow;
 	
-	printf("----------------------------------------------------\n");
+	//printf("----------------------------------------------------\n");
        //printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
 
 	if(raw_x > 0x7FFF)
@@ -141,8 +141,8 @@ void readGyro_XYZ(void)
         //printf("Start  %d  %ld \n",start.tv_sec,start.tv_nsec);
 	//printf("Stop   %d  %ld \n",stop.tv_sec,stop.tv_nsec);
 
-	printf("Raw_Gyro_X : Raw_Gyro_Y : Raw_Gyro_Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
-	printf("Gyro_X : Gyro_Y : Gyro_Z : %f, %f, %f\n", xtotal, ytotal, ztotal);		
+//	printf("Raw_Gyro_X : Raw_Gyro_Y : Raw_Gyro_Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
+//	printf("Gyro_X : Gyro_Y : Gyro_Z : %f, %f, %f\n", xtotal, ytotal, ztotal);		
 	
 	//	stop= clock();
 	//elapsedTime = stop - start;
