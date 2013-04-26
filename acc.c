@@ -5,8 +5,7 @@
 
 unsigned char temp;
 float AccG_X, AccG_Y, AccG_Z;
-
-
+unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;
 /*Initialization sequence of the Accelerometer*/
 void initAcc(void)
 {	
@@ -46,7 +45,7 @@ void readAcc_XYZ(void)
 	unsigned int xlow,xhigh,ylow,yhigh,zlow,zhigh;
 	unsigned int xconcat, yconcat, zconcat;
 	unsigned int raw_xconcat, raw_yconcat, raw_zconcat;
-	unsigned int conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat;
+	//unsigned int conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat;
 	//float AccG_X, AccG_Y, AccG_Z;
 
 	xhigh = read_reg(acc_slvAddr,OUT_X_H);
@@ -82,7 +81,7 @@ void readAcc_XYZ(void)
 	if(raw_yconcat > 0x7FF)
 	{
 		conv_raw_yconcat = -(raw_yconcat - 0x7FF) + 1;
-		AccG_Y = -(float)(raw_yconcat * GSCALE)/0x7FF;
+		//AccG_Y = -(float)(raw_yconcat * GSCALE)/0x7FF;
 	}
 	else
 	{
@@ -103,6 +102,7 @@ void readAcc_XYZ(void)
 	//printf("Raw_x : Raw_Y : Raw_Z : %d, %d, %d\n",raw_xconcat, raw_yconcat, raw_zconcat);
 	//printf("Acc_X : Acc_Y : Acc_Z : %d, %d, %d\n",conv_raw_xconcat, conv_raw_yconcat, conv_raw_zconcat);
 	//printf("AccG_X : AccG_Y : AccG_Z : %f, %f, %f\n", AccG_X, AccG_Y, AccG_Z);
+	printf("Converted Y value %d \n",conv_raw_yconcat);
 	printf("----------------------------------------------------\n");
 }
 

@@ -32,7 +32,7 @@
 /*Defining the address of the fifo control register*/
 #define FIFO_CTRL_REG 0x2E
 
-
+extern unsigned int  raw_x,raw_y,raw_z;
 extern struct timespec gyro_time;
 extern float xtotal, ytotal, ztotal;
 #endif //_GYRO_H_

@@ -18,7 +18,7 @@
 #define OUT_Z_L 0x06
 
 extern float AccG_X, AccG_Y, AccG_Z;
-
+extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;
 void initAcc(void);
 void readAcc_XYZ(void);
 

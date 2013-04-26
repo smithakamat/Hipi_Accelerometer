@@ -8,7 +8,13 @@
 #include "i2c_rw.h"
 
 struct timespec gyro_time;
+
+/*Variables that store the angle in degrees per second*/
 float xtotal, ytotal, ztotal;
+
+/*Variables that store the +/-  raw gyro digital values*/
+unsigned int raw_x,raw_y,raw_z;
+
 
 /*Initialization sequence of the gyroscope*/
 void initGyro(void)
@@ -62,7 +68,7 @@ void readGyro_XYZ(void)
 
 	unsigned char xlow=0, xhigh=0, ylow=0, yhigh=0, zlow=0, zhigh=0;
 	//float xtotal=0, ytotal=0, ztotal=0;
-	unsigned int raw_x, raw_y, raw_z;
+       //unsigned int raw_x, raw_y, raw_z;
 	//struct timespec start,stop,time;
 
 	float elapsedTime;
@@ -85,17 +91,17 @@ void readGyro_XYZ(void)
 	raw_z = (zhigh << 8) + zlow;
 	
 	printf("----------------------------------------------------\n");
-	printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
+       //printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
 
 	if(raw_x > 0x7FFF)
 	{
 		raw_x = -(raw_x - 0x7FFF) + 1;
-		xtotal = raw_x * (8.75f/1000);
+		//xtotal = raw_x * (8.75f/1000);
 	}
 	else
 	{
 		raw_x = raw_x;
-		xtotal = raw_x * (8.75f/1000);
+		//xtotal = raw_x * (8.75f/1000);
 	}
 	
 	if(raw_y > 0x7FFF)

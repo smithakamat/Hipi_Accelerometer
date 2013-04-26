@@ -3,11 +3,16 @@
 #include "gyro.h"
 #include <time.h>
 
+#define GYRO_CONST 0.98f
+#define ACC_CONST  0.02f
+
 void main(void)
 {
       
 	struct timespec prev, current;
 	extern struct timespec gyro_time;
+	extern unsigned int raw_x, raw_y, raw_z; /*Raw digital values of the gyroscope*/
+	extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;   /*Raw +/-  values of the accelerometer */
 	long nano_sec, sec, concat_time;
 	float overall_angle = 0;
 
@@ -51,9 +56,64 @@ void main(void)
 
 
 		/*Calculating the angles*/
+        	      /* Original Complementary filter equation
 		overall_angle = ((0.98f) * (overall_angle + (xtotal * concat_time))) + ((0.02f) * AccG_X);
-		printf("The overall angle is %f\n", overall_angle);
+		printf("The overall angle is %f\n", overall_angle);*/
 		
+
+
+		/*Implementing the switch case to take care of +/-, -/+, -/- and +/+ conditions*/
+   		/*the variable raw_x represents the +/- raw gyro values, the variable conv_raw_yconcat represents the raw +/- Accelerometer values */
+		if (raw_x <= 0x7FFF)
+		{
+                        /*Gyro angle is positive*/
+			float gyro_angle=0;
+			gyro_angle= (float) raw_x * 8.75f/1000;
+			if(conv_raw_yconcat<=0x7FF )
+			{	
+				/*Get the Accelerometer reading in terms of g*/
+   				AccG_Y= (float) conv_raw_yconcat *(float) GSCALE /2048.0;
+				/*Accelerometer is positive, but we need negative y */
+				overall_angle= ((GYRO_CONST) * (overall_angle + (gyro_angle * concat_time))) - ((ACC_CONST)*AccG_Y);
+			}
+			else
+			{
+				/*The Accelerometer value is negative*/
+			        /*Before converting it to g, first make the raw value positive, we'll adjust the negative sign in the
+				complemantary filter equation*/
+				conv_raw_yconcat = conv_raw_yconcat *( -1);
+				AccG_Y = (float) conv_raw_yconcat *(float) GSCALE/2048.0;
+				overall_angle = ((GYRO_CONST) * (overall_angle + (gyro_angle * concat_time))) + ((ACC_CONST)*AccG_Y);
+			}
+		}
+		else
+		{
+			/*Gyro angle is negative*/
+			float gyro_angle=0;
+			/*Make the gyro raw value positive, we will adjust the negative sign in the complementary filter equation*/
+			raw_x = raw_x * (-1);
+			gyro_angle =(float) raw_x * 8.75f/1000;
+			if(conv_raw_yconcat<=0x7FF)
+			{
+				/*Get the Accelerometer reading in terms of g*/
+				AccG_Y= (float) conv_raw_yconcat * (float)GSCALE/2048.0;
+				/*Accelerometer value is positive but we need negative y*/
+				overall_angle= - ((GYRO_CONST)* (overall_angle + (gyro_angle * concat_time))) -((ACC_CONST) * AccG_Y);
+			}
+			else
+			{
+				/*The Accelerometer value is negative*/
+				/*First make it positive*/
+				conv_raw_yconcat= conv_raw_yconcat * (-1);
+				AccG_Y= (float) conv_raw_yconcat *(float) GSCALE/2048.0;
+				overall_angle= ( (GYRO_CONST) * (overall_angle + (gyro_angle * concat_time))) + (ACC_CONST * AccG_Y);
+			}
+                 }
+		printf("The angle is %f\n",overall_angle);
+
+				
+
+
 
 	}
 	
