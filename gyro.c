@@ -14,7 +14,7 @@ float xtotal, ytotal, ztotal;
 
 /*Variables that store the +/-  raw gyro digital values*/
 unsigned int raw_x,raw_y,raw_z;
-
+unsigned int avg_gyro_y;
 
 /*Initialization sequence of the gyroscope*/
 void initGyro(void)
@@ -65,8 +65,7 @@ void initGyro(void)
 /*Reading the X,Y,Z axes values of the gyroscope*/
 void readGyro_XYZ(void)
 {
-
-	unsigned char xlow=0, xhigh=0, ylow=0, yhigh=0, zlow=0, zhigh=0;
+	unsigned char xlow=0, xhigh = 0, ylow=0, yhigh=0, zlow=0, zhigh=0;
 	//float xtotal=0, ytotal=0, ztotal=0;
        //unsigned int raw_x, raw_y, raw_z;
 	//struct timespec start,stop,time;
@@ -89,6 +88,7 @@ void readGyro_XYZ(void)
 	raw_x = (xhigh << 8) + xlow;
 	raw_y = (yhigh << 8) + ylow;
 	raw_z = (zhigh << 8) + zlow;
+	
 	
 	//printf("----------------------------------------------------\n");
        //printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);

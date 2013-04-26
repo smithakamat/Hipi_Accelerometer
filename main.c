@@ -2,13 +2,13 @@
 #include "acc.h"
 #include "gyro.h"
 #include <time.h>
-#include<stdlib.h>
-#include<malloc.h>
-#include<string.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <string.h>
 
-#define GYRO_CONST 0.98f
-#define ACC_CONST  0.02f
-#define COMMENT 0
+#define GYRO_CONST 0.699f
+#define ACC_CONST  0.301f
+#define COMMENT 1
 
 void main(void)
 {
@@ -20,8 +20,21 @@ void main(void)
 	long nano_sec, sec, concat_time;
 	float overall_angle = 0;
 
+	unsigned int avg_count = 0; /*Count variable to calculate the average of the first 10 raw_x gyro values*/
+	unsigned int avg_raw_x; /*Temp variable to hold the average of the first 10 raw_x gyro values*/	
+
 	/*Initialize the Gyroscope*/
         initGyro();
+
+	do{
+		readGyro_XYZ();
+		avg_raw_x = avg_raw_x + raw_x;
+		avg_count++;
+
+	}while(avg_count != 10);
+
+	avg_raw_x = avg_raw_x / 10;
+	
 
 	/*Initialize the Accelerometer*/	
 	initAcc();
@@ -34,10 +47,11 @@ void main(void)
 	{
 		/*Read the X,Y,Z axes values of the accelerometer*/
 		readAcc_XYZ();
-
+	
 	
 		/*Read the X,Y,Z axes values of the gyroscope*/
 		readGyro_XYZ();
+		raw_x = raw_x - avg_raw_x;
 
 		current = gyro_time;
 
