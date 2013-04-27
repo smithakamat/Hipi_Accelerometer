@@ -32,6 +32,9 @@
 /*Defining the address of the fifo control register*/
 #define FIFO_CTRL_REG 0x2E
 
+/*Defining the address of the Temperature register in the gyroscope*/
+#define OUT_TEMP 0x26
+
 extern unsigned int  raw_x,raw_y,raw_z;
 extern struct timespec gyro_time;
 extern float xtotal, ytotal, ztotal;

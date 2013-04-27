@@ -19,24 +19,27 @@ void main(void)
 	extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;   /*Raw +/-  values of the accelerometer */
 	long nano_sec, sec, concat_time;
 	float overall_angle = 0;
-
+	
+	//unsigned int raw_temp=0;
+	//float tempC=0.0;
 	unsigned int avg_count = 0; /*Count variable to calculate the average of the first 10 raw_x gyro values*/
 	unsigned int avg_raw_x = 0; /*Temp variable to hold the average of the first 10 raw_x gyro values*/	
 
 	/*Initialize the Gyroscope*/
         initGyro();
-
+	
+	
 	do{
 		readGyro_XYZ();
-		printf("The %d raw_x value is %d\n", avg_count, raw_x);
+		//printf("The %d raw_x value is %d\n", avg_count, raw_x);
 		avg_raw_x = avg_raw_x + raw_x;
-		printf("The average value of raw_x after iteration %d is %d\n", avg_count, avg_raw_x);
+		//printf("The average value of raw_x after iteration %d is %d\n", avg_count, avg_raw_x);
 		avg_count++;
 
 	}while(avg_count != 10);
 
 	avg_raw_x = avg_raw_x/10;
-	printf("The final average raw_x value of 10 samples is %d\n", avg_raw_x);
+	//printf("The final average raw_x value of 10 samples is %d\n", avg_raw_x);
 	
 
 	/*Initialize the Accelerometer*/	
@@ -55,7 +58,7 @@ void main(void)
 		/*Read the X,Y,Z axes values of the gyroscope*/
 		up:
 		readGyro_XYZ();
-		if(abs(raw_x) >= abs(-30000))
+		if(abs(raw_x) >= abs(-20000))
 		{	
 			printf(" Negative values of raw_x %d\n", raw_x);
 			raw_x = 0;
@@ -63,7 +66,7 @@ void main(void)
 		}
 	
 		raw_x = raw_x - avg_raw_x;
-		printf("The averaged out raw_x gyro values are %d\n", raw_x);
+		//printf("The averaged out raw_x gyro values are %d\n", raw_x);
 
 		current = gyro_time;
 

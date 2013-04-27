@@ -16,6 +16,13 @@ float xtotal, ytotal, ztotal;
 unsigned int raw_x,raw_y,raw_z;
 unsigned int avg_gyro_y;
 
+/*Variable for raw teperature sensor values from the gyro*/
+unsigned int raw_temp;
+
+/*Variable for temperature in degree celsius*/
+float tempC;
+
+
 /*Initialization sequence of the gyroscope*/
 void initGyro(void)
 {
@@ -89,6 +96,15 @@ void readGyro_XYZ(void)
 	raw_y = (yhigh << 8) + ylow;
 	raw_z = (zhigh << 8) + zlow;
 	
+	/*Obtaining the raw temperature values from the temperature sensor in the gyroscope*/
+	raw_temp = read_reg(gyro_slvAddr,OUT_TEMP);
+	printf("The raw temperature values are %d\n", raw_temp);
+	
+	/*Converting the raw temperature sensor values to degree celsius*/
+	tempC = 35.0 + ((raw_temp + 13200)/280.0);
+	printf("The actual temperature sensed by the gyro is %f\n", tempC);
+	
+
 	
 	//printf("----------------------------------------------------\n");
        //printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
