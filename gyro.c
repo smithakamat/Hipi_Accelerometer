@@ -98,6 +98,12 @@ void readGyro_XYZ(void)
 	
 	/*Obtaining the raw temperature values from the temperature sensor in the gyroscope*/
 	raw_temp = read_reg(gyro_slvAddr,OUT_TEMP);
+	
+	if(raw_temp > 0x7F)
+		raw_temp = -(raw_temp - 0x7F)+ 1;
+	else
+		raw_temp = raw_temp;
+
 	printf("The raw temperature values are %d\n", raw_temp);
 	
 	/*Converting the raw temperature sensor values to degree celsius*/

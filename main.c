@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 #define GYRO_CONST 0.699f
 #define ACC_CONST  0.301f
@@ -19,6 +21,8 @@ void main(void)
 	extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;   /*Raw +/-  values of the accelerometer */
 	long nano_sec, sec, concat_time;
 	float overall_angle = 0;
+	int fp;/*File pointer to a file to store tilt angle values*/
+	int i = 0;
 	
 	//unsigned int raw_temp=0;
 	//float tempC=0.0;
@@ -145,7 +149,36 @@ void main(void)
 				overall_angle= ( (GYRO_CONST) * (overall_angle + (gyro_angle * concat_time))) + (ACC_CONST * AccG_Y);
 			}
                  }
-		printf("The angle is %f\n",overall_angle);
+		printf("The tilt angle is %f\n",overall_angle);
+
+
+
+		/*Code for plotting*/
+		
+		char * commandsForGnuplot[] = {"set title \"PLOTTTTT\"", "plot 'values.txt'"};
+		
+		fp = open("values.txt",O_RDWR | O_APPEND | O_CREAT, 0x0644); /*Create a file called values.txt in the current directory and open it in append mode*/
+		//write(fp,"hello",10);
+		printf("File is being writen into\n");
+		//close(fp);
+		
+		/*Open an interface to communicate with GNUPLOT*/
+		FILE *gnuplotpipe = popen("gnuplot -persistent", "w");
+
+		/*Write the tilt angle values in a temporary file*/
+		printf("Writing values to the file values.txt\n");
+		//for(i =0; i< 5; i++)
+		//{
+			write(fp, &overall_angle, sizeof(float));
+		//}
+
+		/*plot the graph!!!*/
+		printf("Plotting\n");
+		for(i =0; i<2 ;i++)
+		{
+			/*Send commands to the Gnuplot one by one*/
+			fprintf(gnuplotpipe, "%s \n", commandsForGnuplot[i]);
+		}
 
 #endif 
 				
