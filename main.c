@@ -21,7 +21,7 @@ void main(void)
 	extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;   /*Raw +/-  values of the accelerometer */
 	long nano_sec, sec, concat_time;
 	float overall_angle = 0;
-	int fp;/*File pointer to a file to store tilt angle values*/
+	//FILE *fp;/*File pointer to a file to store tilt angle values*/
 	int i = 0;
 	
 	//unsigned int raw_temp=0;
@@ -40,7 +40,7 @@ void main(void)
 		//printf("The average value of raw_x after iteration %d is %d\n", avg_count, avg_raw_x);
 		avg_count++;
 
-	}while(avg_count != 10);
+	}while(avg_count != 1);
 
 	avg_raw_x = avg_raw_x/10;
 	//printf("The final average raw_x value of 10 samples is %d\n", avg_raw_x);
@@ -150,28 +150,28 @@ void main(void)
 			}
                  }
 		printf("The tilt angle is %f\n",overall_angle);
-
+#endif
 
 
 		/*Code for plotting*/
 		
-		char * commandsForGnuplot[] = {"set title \"PLOTTTTT\"", "plot 'values.txt'"};
-		
-		fp = open("values.txt",O_RDWR | O_APPEND | O_CREAT, 0x0644); /*Create a file called values.txt in the current directory and open it in append mode*/
-		//write(fp,"hello",10);
+		char * commandsForGnuplot[] = {"set title \"PLOTTTTT\"", "plot 'val.txt'"};
+		double xval[5] = {1.0, 2.0, 3.0, 4.0};
+		double yval[5] = {1.0, 2.0, 3.0, 4.0};
+		FILE * fp = fopen("val.txt","w"); /*Create a file called values.txt in the current directory and open it in append mode*/
+	
 		printf("File is being writen into\n");
-		//close(fp);
-		
+
 		/*Open an interface to communicate with GNUPLOT*/
-		FILE *gnuplotpipe = popen("gnuplot -persistent", "w");
+		FILE * gnuplotpipe = popen("gnuplot -persistent", "w");
 
 		/*Write the tilt angle values in a temporary file*/
 		printf("Writing values to the file values.txt\n");
-		//for(i =0; i< 5; i++)
-		//{
-			write(fp, &overall_angle, sizeof(float));
-		//}
-
+	
+		for(i = 0; i<5; i++)
+		{
+		fprintf(fp, "%lf %lf\n",xval[i],yval[i]);
+		}
 		/*plot the graph!!!*/
 		printf("Plotting\n");
 		for(i =0; i<2 ;i++)
@@ -180,7 +180,7 @@ void main(void)
 			fprintf(gnuplotpipe, "%s \n", commandsForGnuplot[i]);
 		}
 
-#endif 
+//#endif 
 				
 
 
