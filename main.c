@@ -23,11 +23,17 @@ void main(void)
 	float overall_angle = 0;
 	//FILE *fp;/*File pointer to a file to store tilt angle values*/
 	int i = 0;
-	
+	unsigned int j = 0;	
+	double xval[10] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};/*Array storing the x axis co-ordinate values for the plot*/
+	double yval[10] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};	/*Array storing the y axis co-ordinate value for the plot*/
+	double plot_time = 0.0; /*Temporary Variable to store the y axis co-ordinates for the plot*/
+
 	//unsigned int raw_temp=0;
 	//float tempC=0.0;
 	unsigned int avg_count = 0; /*Count variable to calculate the average of the first 10 raw_x gyro values*/
 	unsigned int avg_raw_x = 0; /*Temp variable to hold the average of the first 10 raw_x gyro values*/	
+
+	printf("Initializing hardware\n");
 
 	/*Initialize the Gyroscope*/
         initGyro();
@@ -40,7 +46,7 @@ void main(void)
 		//printf("The average value of raw_x after iteration %d is %d\n", avg_count, avg_raw_x);
 		avg_count++;
 
-	}while(avg_count != 1);
+	}while(avg_count != 10);
 
 	avg_raw_x = avg_raw_x/10;
 	//printf("The final average raw_x value of 10 samples is %d\n", avg_raw_x);
@@ -49,11 +55,11 @@ void main(void)
 	/*Initialize the Accelerometer*/	
 	initAcc();
 
-
+	printf("Initialization of the hardware complete\n");
 
        clock_gettime(CLOCK_MONOTONIC, &prev);
 	
-	while(1)
+	do
 	{
 		/*Read the X,Y,Z axes values of the accelerometer*/
 		readAcc_XYZ();
@@ -64,7 +70,7 @@ void main(void)
 		readGyro_XYZ();
 		if(abs(raw_x) >= abs(-20000))
 		{	
-			printf(" Negative values of raw_x %d\n", raw_x);
+			//printf(" Negative values of raw_x %d\n", raw_x);
 			raw_x = 0;
 			//goto up;
 		}
@@ -98,7 +104,9 @@ void main(void)
 		printf("The overall angle is %f\n", overall_angle);*/
 		
 		printf("Raw Gyro Value : %d\n",raw_x);
-		printf("Time in secs is: %ld\n",concat_time);
+		//printf("Time in secs is: %ld\n",concat_time);
+		
+		plot_time = plot_time + concat_time;  /*Update the x axes values*/
 		
 #if COMMENT	
 
@@ -150,14 +158,19 @@ void main(void)
 			}
                  }
 		printf("The tilt angle is %f\n",overall_angle);
-#endif
+#endif		
 
-
+		//unsigned int j = 0;
+		//double xval[3];
+		xval[j] = plot_time;
+		yval[j] = overall_angle;
+		j++;
+}while(j!= 10);
 		/*Code for plotting*/
 		
-		char * commandsForGnuplot[] = {"set title \"PLOTTTTT\"", "plot 'val.txt'"};
-		double xval[5] = {1.0, 2.0, 3.0, 4.0};
-		double yval[5] = {1.0, 2.0, 3.0, 4.0};
+		char * commandsForGnuplot[] = {"set title \"Plot of Tilt angle (y axis) v/s Time (x axis)\"", "plot 'val.txt'"};
+		//double xval[5] = {1.0, 2.0, 3.0, 4.0};
+		//double yval[3] = {1.0, 2.0, 3.0};
 		FILE * fp = fopen("val.txt","w"); /*Create a file called values.txt in the current directory and open it in append mode*/
 	
 		printf("File is being writen into\n");
@@ -168,10 +181,13 @@ void main(void)
 		/*Write the tilt angle values in a temporary file*/
 		printf("Writing values to the file values.txt\n");
 	
-		for(i = 0; i<5; i++)
+		for(i = 0; i<10; i++)
 		{
-		fprintf(fp, "%lf %lf\n",xval[i],yval[i]);
+			fprintf(fp, "%lf %lf\n",xval[i],yval[i]);
 		}
+
+		fclose(fp);
+
 		/*plot the graph!!!*/
 		printf("Plotting\n");
 		for(i =0; i<2 ;i++)
@@ -179,12 +195,12 @@ void main(void)
 			/*Send commands to the Gnuplot one by one*/
 			fprintf(gnuplotpipe, "%s \n", commandsForGnuplot[i]);
 		}
-
+		fflush(gnuplotpipe);	
 //#endif 
 				
 
 
-	}
+
 	
 }
 

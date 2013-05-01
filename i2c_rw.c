@@ -48,20 +48,5 @@ void write_reg(unsigned char slv_addr,unsigned char reg_addr, unsigned char val)
    
 }
 
-/*int main()
-{
-	unsigned char temp=0;
-
-	temp=read_reg(0x1D, 0x0D);
-	
-	printf("The value read is %d\n",temp);
-	
-        temp=read_reg(0x1D,0x2A);
-	printf("CTRL_REG %d \n",temp);
-	temp=temp & 0x7E;
-	write_reg(0x1D,0x2A,temp);
-	//printf("temp %d\n",temp);
-}
-*/
 
 

@@ -1,11 +1,17 @@
+/*Header comments to be included*/
+/*The code below initializes the gyroscope sensor -->   , reads the angular velocity values along X, Y, Z values*/
+
+/*Preprocessor directives and user defined header files*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include<time.h>
+#include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>   
 #include "gyro.h"
 #include "i2c_rw.h"
+
+/*Declaration of global variables and structures*/
 
 struct timespec gyro_time;
 
@@ -27,14 +33,14 @@ float tempC;
 void initGyro(void)
 {
 	unsigned char temp,dev_identify;
-	//sleep(1);
+
 	/*Read the device identification register of the Gyroscope*/
 	dev_identify = read_reg(0x6B,0x0F);
-	printf("The dev ID if gyro is %d\n", dev_identify);
-	if(temp == 0xD4 )
+	//printf("The dev ID if gyro is %d\n", dev_identify);
+	//if(temp == 0xD4 )
 		printf("The Gyroscope is on I2C bus - 1\n");
-	else
-		printf("ERROR !!! - Gyroscope  not found on I2C bus - 1\n");
+	//else
+		//printf("ERROR !!! - Gyroscope  not found on I2C bus - 1\n");
 
 	
 	/*Write into CTRL_REG1 in order to enable x, y and z axes output of the gyro*/
@@ -80,6 +86,10 @@ void readGyro_XYZ(void)
 	float elapsedTime;
 	//clock_gettime(CLOCK_MONOTONIC,&start);
 
+	/*The angular velocity values of the gyroscope along X, Y and Z axes are 12 bit values*/
+	/*The values range from 0 to 4095. The positive angular velocity values are from 0 to 2047*/
+	/*The values from 2048 to 4095 are negative*/
+
 
 	xlow = read_reg(gyro_slvAddr,OUT_X_Lo);
 	xhigh = read_reg(gyro_slvAddr,OUT_X_Hi);
@@ -90,8 +100,10 @@ void readGyro_XYZ(void)
 	zlow = read_reg(gyro_slvAddr,OUT_Z_Lo);
 	zhigh = read_reg(gyro_slvAddr,OUT_Z_Hi);
 
+	/*Obtain the timestamp when the X,Y, Z gyro values are read*/
 	clock_gettime(CLOCK_MONOTONIC,&gyro_time);
-
+	
+	/*Concatenate the LSB and MSB values of the X, Y and Z register values of the gyroscope to obtain the 12 bi value*/
 	raw_x = (xhigh << 8) + xlow;
 	raw_y = (yhigh << 8) + ylow;
 	raw_z = (zhigh << 8) + zlow;
@@ -104,16 +116,20 @@ void readGyro_XYZ(void)
 	else
 		raw_temp = raw_temp;
 
-	printf("The raw temperature values are %d\n", raw_temp);
+	//printf("The raw temperature values are %d\n", raw_temp);
 	
 	/*Converting the raw temperature sensor values to degree celsius*/
 	tempC = 35.0 + ((raw_temp + 13200)/280.0);
-	printf("The actual temperature sensed by the gyro is %f\n", tempC);
+	//printf("The actual temperature sensed by the gyro is %f\n", tempC);
 	
 
 	
 	//printf("----------------------------------------------------\n");
        //printf("X : Y : Z : %d, %d, %d\n", raw_x, raw_y, raw_z);
+
+	/*Since we are considering only the horizontal movement of the PCB, we are considering only the X axis values of the Gyroscope*/
+	/*The values read from the X, Y and Z registers of the Gyroscope are in 2's complement form.*/
+	/*The following algorithm converts the gyroscope values in the -250dps to +250dps range*/	
 
 	if(raw_x > 0x7FFF)
 	{
