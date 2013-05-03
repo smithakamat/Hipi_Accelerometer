@@ -1,3 +1,10 @@
+/*Description : This is the header file for the gyro.c code.
+The addresses of the control registers, output registers of the gyroscope 
+sensors used in the gyroc file have been defined here, alng with the functions used
+
+Authors : Smitha Sunil Kamat, Jay Khandhar
+*/
+
 #ifndef _GYRO_H
 #define _GYRO_H
 
@@ -5,7 +12,7 @@
 #define gyro_slvAddr 0x6B
 
 /*************************************************************************************************
-****Definition of the addresses of the of the hardware registers in L3G4200D**********************
+****Definition of the addresses of the of the hardware registers in L3GD20**********************
 **************************************************************************************************/
 
 /*Defining the address of the WHO_AM_I device identification register*/

@@ -1,3 +1,11 @@
+/*Description: The following is the driver code that is used to implement the I2C read and write 
+from the gyroscope and accelerometer registers. The HiPi modules have been used to access kernel
+drivers for I2C devices
+
+Authors: Smitha Sunil Kamat, Jay Khandhar 
+*/
+
+/*Preprocessor directives*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,17 +18,14 @@ unsigned char  read_reg(unsigned char slv_addr,unsigned char reg_addr)
 	unsigned char out, val;
 	char test_buff[20];
 	sprintf(test_buff, "hipi-i2c r 1 0x%02X 0x%02X 1", slv_addr, reg_addr);
-       //printf("The test_buff is %s\n", test_buff);
+
 	fp = popen(test_buff, "r");
 	if(fp == NULL)
 		printf("Unable to open the pipe\n");
 	else
-	//	printf("Successfull in opening the pipe\n");
 	out=fread(buff,sizeof(char),sizeof(buff)-1,fp);
-	//printf("The value in buffer is %d\n", out);
 	fclose(fp);
 	val =  atoi(buff);
-	//printf("The number of bytes read is %d and the value is %d\n", out, val);
 	return val;
 }
 
@@ -33,7 +38,6 @@ void write_reg(unsigned char slv_addr,unsigned char reg_addr, unsigned char val)
         unsigned char out, temp_val;
 	char test_buff[20];
 	sprintf(test_buff, "hipi-i2c w 1 0x%02X 0x%02X 0x%02X ",slv_addr,reg_addr,val);
-       // printf("TEST BUFF is %s\n",test_buff);	
 	fp=popen(test_buff,"r");
 	if(fp==NULL)
 		printf("Unable to open the pipe\n");
@@ -43,7 +47,6 @@ void write_reg(unsigned char slv_addr,unsigned char reg_addr, unsigned char val)
 	out=fread(buff,sizeof(char),sizeof(buff)-1,fp);
 	fclose(fp);
 	temp_val=atoi(buff);
-	//printf("Val is %d\n",temp_val);
 	return;
    
 }

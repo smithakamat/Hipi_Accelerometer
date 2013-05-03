@@ -1,3 +1,15 @@
+/*Description: This code utilizes the angular velocity of the gyroscope along the X axis and the 
+velocity sensed by the acclerometer along the Y axis and implements the digital complementary filter 
+to calculate the appropriate tilt angle and also to remove drift and other associted noise of the sensors.
+The tilt angles and the timing parameter are then fed to the GNUPLOT and the disrection of motion is plotted
+
+The follwoing code plots the tilt angle as a function of time only for the first 10 values obtained from
+the gyroscope
+
+Authors: Smitha Sunil Kamat, Jay Khandhar
+*/
+
+/*Preprocessor directives and user defined header files*/
 #include <stdio.h>
 #include "acc.h"
 #include "gyro.h"
@@ -8,56 +20,56 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+/*Declaration of macros*/
+
+/*The GYRO_CONST is the gyroscope complementary filter co-efficient
+The ACC_CONST is the acceleromter complementary filter co-efficient*/
 #define GYRO_CONST 0.699f
 #define ACC_CONST  0.301f
 #define COMMENT 1
 
 void main(void)
 {
-      
+  	/*Declaration of Local variables and structures*/
 	struct timespec prev, current;
 	extern struct timespec gyro_time;
-	extern unsigned int raw_x, raw_y, raw_z; /*Raw digital values of the gyroscope*/
-	extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;   /*Raw +/-  values of the accelerometer */
-	long nano_sec, sec, concat_time;
-	float overall_angle = 0;
-	//FILE *fp;/*File pointer to a file to store tilt angle values*/
+	extern unsigned int raw_x, raw_y, raw_z; /*Raw digital values of the angular velocities of the gyroscope*/
+	extern unsigned int conv_raw_xconcat,conv_raw_yconcat,conv_raw_zconcat;   /*Raw positive and negative angular velocity values of the accelerometer */
+	long nano_sec, sec, concat_time; 
+	float overall_angle = 0; /*Variable to store the overall tilt angle*/
 	int i = 0;
 	unsigned int j = 0;	
-	double xval[10] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};/*Array storing the x axis co-ordinate values for the plot*/
-	double yval[10] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};	/*Array storing the y axis co-ordinate value for the plot*/
-	double plot_time = 0.0; /*Temporary Variable to store the y axis co-ordinates for the plot*/
+	double xval[10] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; /*Array storing the x axis co-ordinate values(tilt angle) for the plot*/
+	double yval[10] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; /*Array storing the y axis co-ordinate values(time) for the plot*/
+	double plot_time = 0.0; /*Temporary Variable to store the incremental y axis co-ordinates for the plot*/
 
-	//unsigned int raw_temp=0;
-	//float tempC=0.0;
 	unsigned int avg_count = 0; /*Count variable to calculate the average of the first 10 raw_x gyro values*/
 	unsigned int avg_raw_x = 0; /*Temp variable to hold the average of the first 10 raw_x gyro values*/	
 
-	printf("Initializing hardware\n");
+	printf("------------------------------------Initializing hardware---------------------------------------\n");
 
 	/*Initialize the Gyroscope*/
         initGyro();
 	
-	
+	/*Obtain the first 10 raw angular velocity values along the x axis from the gyro*/
+	/*Subtract the average of the 10 values from the gyro from the subsequent read values*/
 	do{
 		readGyro_XYZ();
-		//printf("The %d raw_x value is %d\n", avg_count, raw_x);
 		avg_raw_x = avg_raw_x + raw_x;
-		//printf("The average value of raw_x after iteration %d is %d\n", avg_count, avg_raw_x);
 		avg_count++;
 
 	}while(avg_count != 10);
 
+	/*Store the average value in a temporary variable*/
 	avg_raw_x = avg_raw_x/10;
-	//printf("The final average raw_x value of 10 samples is %d\n", avg_raw_x);
-	
 
 	/*Initialize the Accelerometer*/	
 	initAcc();
 
-	printf("Initialization of the hardware complete\n");
+	printf("---------------------------------Initialization of the hardware complete-----------------------------------\n");
 
-       clock_gettime(CLOCK_MONOTONIC, &prev);
+	/*Obtain the timestamp when the last x angular velocity value was obtained*/
+        clock_gettime(CLOCK_MONOTONIC, &prev);
 	
 	do
 	{
@@ -66,21 +78,19 @@ void main(void)
 	
 	
 		/*Read the X,Y,Z axes values of the gyroscope*/
-		up:
 		readGyro_XYZ();
+
+		/*Neglect negative angular velocity values beyond 20000*/
 		if(abs(raw_x) >= abs(-20000))
 		{	
-			//printf(" Negative values of raw_x %d\n", raw_x);
 			raw_x = 0;
-			//goto up;
 		}
 	
 		raw_x = raw_x - avg_raw_x;
-		//printf("The averaged out raw_x gyro values are %d\n", raw_x);
 
+		/*Update the current timestamp*/
 		current = gyro_time;
 
-		
 
 		/*Calculating the time between two consecutive gyro angle reads*/
 		if((current.tv_nsec - prev.tv_nsec) < 0)
@@ -97,18 +107,16 @@ void main(void)
 		concat_time = sec + (nano_sec/1000000000);
 		memcpy((unsigned char *)&prev,(unsigned char *)&current,sizeof(struct timespec));
 
-
-		/*Calculating the angles*/
-        	      /* Original Complementary filter equation
-		overall_angle = ((0.98f) * (overall_angle + (xtotal * concat_time))) + ((0.02f) * AccG_X);
-		printf("The overall angle is %f\n", overall_angle);*/
-		
 		printf("Raw Gyro Value : %d\n",raw_x);
-		//printf("Time in secs is: %ld\n",concat_time);
 		
 		plot_time = plot_time + concat_time;  /*Update the x axes values*/
 		
 #if COMMENT	
+		
+		/*-------------------------------Complementary filter implementation---------------------------------------*/
+		/*The part of the complementary filter equation involving the gyro values and the gyro constant represent the 
+		integrator/high pass filter and the part of the equation involving the accleromter constant and the accelerometer
+		value reperesents the low pass filter*/
 
 		/*Implementing the switch case to take care of +/-, -/+, -/- and +/+ conditions*/
    		/*the variable raw_x represents the +/- raw gyro values, the variable conv_raw_yconcat represents the raw +/- Accelerometer values */
@@ -160,27 +168,24 @@ void main(void)
 		printf("The tilt angle is %f\n",overall_angle);
 #endif		
 
-		//unsigned int j = 0;
-		//double xval[3];
 		xval[j] = plot_time;
 		yval[j] = overall_angle;
 		j++;
-}while(j!= 10);
-		/*Code for plotting*/
-		
-		char * commandsForGnuplot[] = {"set title \"Plot of Tilt angle (y axis) v/s Time (x axis)\"", "plot 'val.txt'"};
-		//double xval[5] = {1.0, 2.0, 3.0, 4.0};
-		//double yval[3] = {1.0, 2.0, 3.0};
-		FILE * fp = fopen("val.txt","w"); /*Create a file called values.txt in the current directory and open it in append mode*/
-	
-		printf("File is being writen into\n");
+	}while(j!= 10);
 
-		/*Open an interface to communicate with GNUPLOT*/
+
+		/*--------------------------------------Code for plotting the graph using GNUPLOT----------------------------*/
+		
+		/*Charcter pointer to the plot*/
+		char * commandsForGnuplot[] = {"set title \"Plot of Tilt angle (y axis) v/s Time (x axis)\"", "plot 'val.txt'"};
+	
+		/*Create a text file in the write mode to store the tilt anle and the time values*/
+		FILE * fp = fopen("val.txt","w"); 
+
+		/*Open a pipe to communicate with GNUPLOT*/
 		FILE * gnuplotpipe = popen("gnuplot -persistent", "w");
 
-		/*Write the tilt angle values in a temporary file*/
-		printf("Writing values to the file values.txt\n");
-	
+		/*Write the tilt angle values in the text file*/
 		for(i = 0; i<10; i++)
 		{
 			fprintf(fp, "%lf %lf\n",xval[i],yval[i]);
@@ -188,8 +193,7 @@ void main(void)
 
 		fclose(fp);
 
-		/*plot the graph!!!*/
-		printf("Plotting\n");
+		printf("-----------------Plotting the graph---------------------\n");
 		for(i =0; i<2 ;i++)
 		{
 			/*Send commands to the Gnuplot one by one*/
@@ -197,10 +201,6 @@ void main(void)
 		}
 		fflush(gnuplotpipe);	
 //#endif 
-				
-
-
-
 	
 }
 
